@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- 如旧浏览器不支持shadowDOM, 使用以下polyfill -->
-    <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.5.0/webcomponents-bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.5.0/webcomponents-bundle.min.js"></script> -->
     <script type="module" src="./lib/index.js"></script>
     <link
       rel="stylesheet"
@@ -72,7 +72,7 @@
         font-weight: 700;
       }
     </style>
-    <title>web-spreadsheet</title>
+    <title>web-questionnaire</title>
     <style>
       html,
       body {
@@ -100,10 +100,11 @@
       }
       .card {
         position: relative;
-        border: 1px solid #aaa;
-        margin: 0 0 0 20px;
-        width: 1255px;
-        height: 345px;
+        /* width: 1000px; */
+        height: calc(100vh - 60px);
+        margin: 0 20px;
+        background: #fff;
+        outline: 1px solid #eee;
         overflow: auto;
       }
       .wrap {
@@ -155,13 +156,13 @@
   </head>
   <body>
     <h1>
-      <span>web-spreadsheet documentation</span>
-      <a href="https://github.com/icheer/web-spreadsheet" target="_blank">Github</a>
+      <span>web-questionnaire documentation</span>
+      <a href="https://github.com/icheer/web-questionnaire" target="_blank">Github</a>
     </h1>
     <div class="card">
-      <spread-sheet></spread-sheet>
+      <web-questionnaire />
     </div>
-    <div class="wrap">
+    <!-- <div class="wrap">
       <pre class="main">
         <code class="language-js"></code>
       </pre>
@@ -212,176 +213,131 @@
           <li>...</li>
         </ul>
       </div>
-    </div>
+    </div> -->
 <script class="real-code">
-  let columns = [
-    {
-      text: '出行人员姓名',
-      key: 'name',
-      type: 'input',
-      width: '7em',
-      props: {
-        maxlength: 10
-      },
-      params: {
-        validator: (value, row) => {
-          const name = (value || '').trim();
-          if (!name) return '请输入姓名';
-          if (name.length > 10) return '姓名长度应小于等于10';
+  let data = {
+    id: '2d8e34f81c90b',
+    title: '调查问卷',
+    intro: '亲爱的同学:\n请在10分钟内完成此问卷,谢谢!',
+    questions: [
+      {
+        id: '000',
+        title: '您的姓名?',
+        type: 'input',
+        attrs: {
+          maxlength: 15
         }
-      }
-    },
-    {
-      text: '所属部门',
-      key: 'dept',
-      type: 'select',
-      width: '5em',
-      items: [
-        { label: '运营部', value: 'OP' },
-        { label: 'IT部', value: 'IT' }
-      ]
-    },
-    {
-      text: '证件类型',
-      key: 'idType',
-      type: 'select',
-      width: '6em',
-      items: [
-        { label: '身份证', value: 'ID' },
-        { label: '护照', value: 'PASSPORT' }
-      ]
-    },
-    {
-      text: '证件号码',
-      key: 'idNumber',
-      type: 'input',
-      width: '8.5em',
-      props: {
-        maxlength: 18
-      }
-    },
-    {
-      text: '报名费',
-      key: 'fee',
-      align: 'right',
-      type: 'input',
-      width: '5em',
-      props: {
-        maxlength: 6
       },
-      params: {
-        validator: str => {
-          if (!str) return;
-          const num = +str;
-          if (Number.isNaN(num)) return '请输入数字';
-        },
-        formatter: str => {
-          const num = +str;
-          return '￥' + num.toFixed(2);
-        }
-      }
-    },
-    {
-      text: '总费用(含工本费)',
-      key: 'totalFee',
-      align: 'right',
-      type: 'input',
-      width: '9em',
-      props: {
-        maxlength: 6
+      {
+        id: '001',
+        title: '您的身份?',
+        type: 'single-choice',
+        items: [
+          {
+            label: '公司职员',
+            value: 'EMPLOYEE'
+          },
+          {
+            label: '在校生',
+            value: 'STUDENT'
+          }
+        ]
       },
-      params: {
-        validator: str => {
-          if (!str) return;
-          const num = +str;
-          if (Number.isNaN(num)) return '请输入数字';
-        },
-        formatter: str => {
-          const num = +str;
-          return '￥' + num.toFixed(2);
-        },
-        computed: (row, column) => {
-          const num = +row.fee || 0;
-          const imgLength = (row.pics || []).length;
-          return (num + imgLength).toFixed(2);
+      {
+        id: '002',
+        title: '您的岗位?',
+        type: 'single-choice',
+        items: [
+          {
+            label: '行政',
+            value: 'OFFICE'
+          },
+          {
+            label: '销售',
+            value: 'SALES'
+          },
+          {
+            label: '公司高管',
+            value: 'MANAGER'
+          }
+        ],
+        props: {
+          showIf: '001=EMPLOYEE'
         }
+      },
+      {
+        id: '003',
+        title: '您的专业?',
+        type: 'single-choice',
+        items: [
+          {
+            label: '经济管理',
+            value: 'ECO'
+          },
+          {
+            label: '计算机科学与技术',
+            value: 'CS'
+          },
+          {
+            label: '物理学',
+            value: 'PHYSICS'
+          }
+        ],
+        props: {
+          showIf: '001=STUDENT'
+        }
+      },
+      {
+        id: '004',
+        title: '您感兴趣的领域有哪些?',
+        type: 'multi-choice',
+        items: [
+          {
+            label: '音乐',
+            value: 'MUSIC'
+          },
+          {
+            label: '电影',
+            value: 'MOVIE'
+          },
+          {
+            label: '阅读',
+            value: 'READING'
+          },
+          {
+            label: '金融',
+            value: 'FINANCE'
+          },
+          {
+            label: '运动',
+            value: 'SPORT'
+          },
+          {
+            label: '电子游艺',
+            value: 'GAMES'
+          },
+          {
+            label: '其他',
+            value: 'OTHERS',
+            extra: true,
+            type: 'input',
+            attrs: {
+              maxlength: 10
+            }
+          }
+        ]
       }
-    },
-    {
-      text: '照片',
-      key: 'pics',
-      type: 'image',
-      width: '8.5em',
-      props: {
-        max: 3,
-        uploadApi: 'http://192.168.105.11:28080/api/file/common/upload1'
-      }
-    },
-    {
-      text: '最近修改时间',
-      key: 'updateTime',
-      type: 'date',
-      width: '8em'
-    }
-  ];
-  let data = [
-    {
-      name: '张三',
-      dept: 'OP',
-      idType: 'ID',
-      idNumber: '12341122234',
-      fee: 33,
-      pics: [
-        'https://github.blog/wp-content/uploads/2019/03/product-social.png?fit=1201%2C630',
-        '//fpoimg.com/400x400?text=Preview&bg_color=000000',
-        '//fpoimg.com/400x400?text=Preview&bg_color=ffeeee'
-      ],
-      updateTime: '2020-02-01'
-    },
-    {
-      name: '李四',
-      dept: 'IT',
-      idType: 'ID',
-      idNumber: '987699967876',
-      fee: 51,
-      pics: ['//fpoimg.com/400x400?text=Preview&bg_color=eeffee'],
-      updateTime: '2020-02-01'
-    },
-    {
-      name: '王五',
-      dept: 'OP',
-      idType: 'PASSPORT',
-      idNumber: '332314412',
-      fee: 128,
-      pics: [
-        '//fpoimg.com/400x400?text=Preview&bg_color=eeeeff',
-        '//fpoimg.com/400x400?text=Preview&bg_color=ffffee'
-      ],
-      updateTime: '2020-02-02'
-    },
-    {
-      name: '赵六',
-      dept: 'IT',
-      idType: 'ID',
-      idNumber: '8255478223',
-      fee: 0,
-      pics: [],
-      updateTime: '2020-02-02'
-    }
-  ];
-  while (data.length < 30) {
-    data.push(...JSON.parse(JSON.stringify(data))); // copy some rows
-  }
+    ]
+  };
   window.onload = function () {
-    let comp = document.querySelector('spread-sheet');
-    comp.columns = columns;
+    let comp = document.querySelector('web-questionnaire');
     comp.data = data;
     window.addEventListener('change', e => {
       console.log(e.detail);
     });
   };
 </script>
-    <script>
+    <!-- <script>
       (function () {
         var code = document.querySelector('script.real-code').outerHTML.replace(' class="real-code"', '');
         document.querySelector('pre.main code').innerText = code;
@@ -396,6 +352,6 @@
         var s = document.getElementsByTagName("script")[0]; 
         s.parentNode.insertBefore(hm, s);
       })();
-    </script>
+    </script> -->
   </body>
 </html>
