@@ -1,9 +1,9 @@
 <template lang="pug">
 svelte:options(tag="question-item")
-+if("isVisible")
+.q-item(style="{question.style}")
   h3 { index + 1 }.{ type === 'multi-choice' ? ' [多选题] ' : ' ' }{ question.title }
   +if("type === 'input'")
-    input(bind:value="{value}" on:input="{onChange}")
+    input(bind:value="{value}" on:input="{onChange}" "{...attrs}")
   +if("type === 'single-choice'")
     +each("question.items as item (item.value)")
       label
@@ -20,19 +20,13 @@ svelte:options(tag="question-item")
 export let question = {};
 export let index = 0;
 let value = '';
-import { questions, answers } from '@/store/store';
 
-$: isVisible = getVisibleStatus();
+import { copy } from '@/helper/func';
+import { questions } from '@/store/store';
+
+$: questionId = question.id;
 $: type = question.type || 'input';
-
-// 计算显隐状态
-function getVisibleStatus() {
-  const { props = {} } = question;
-  const { showIf } = props;
-  if (!showIf) return true;
-  const [ qId, answer ] = showIf.split('=');
-  return answers[qId] === answer;
-}
+$: attrs = question.attrs || {};
 
 // 值改变时
 function onChange(e) {
@@ -54,22 +48,29 @@ function onChange(e) {
   } else {
     value = v;
   }
-  console.log(value);
+  const q = $questions.find(q => q.id === questionId);
+  q.answer = value;
+  question = copy(q);
+  $questions = copy($questions);
 }
 </script>
 
 <style lang="less">
-label {
-  display: block;
-  width: 100%;
-  margin: 4px 0;
-  line-height: 2em;
-  &:hover {
-    background-color: #f3f3f3;
-  }
-  span {
-    margin-left: 4px;
-    user-select: none;
+.q-item {
+  position: relative;
+  overflow: hidden;
+  label {
+    display: block;
+    width: 100%;
+    margin: 4px 0;
+    line-height: 2em;
+    &:hover {
+      background-color: #f3f3f3;
+    }
+    span {
+      margin-left: 4px;
+      user-select: none;
+    }
   }
 }
 </style>
