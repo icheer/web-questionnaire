@@ -3,9 +3,9 @@ export const sleep = time => new Promise(resolve => setTimeout(resolve, time));
 export const copy = json => JSON.parse(JSON.stringify(json));
 
 export const genRandId = () => {
-  const prefix = ((Date.now() % 1000 + Math.random()) / 0.00000117).toString(16).replace('.', '').slice(-3);
-  const rand = (Math.random()).toString(16).replace(/^0\./, '');
-  return prefix + rand;
+  const prefix = (+new Date().toLocaleString().replace(/\D/g, '').replace(/^20/, '')).toString(16);
+  const rand = Math.random().toString(16).replace(/^0\./, '');
+  return (prefix + rand).slice(0, 18);
 }
 
 export const getLabelFromDict = (value, dict) => {
